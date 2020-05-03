@@ -1,6 +1,6 @@
 # DelphiByteStreamReader
 JavaScript class that provides methods to read byte stream written in Delphi.
-Supports Delphi Simple types and ShortString.
+Supports Delphi Simple types, ShortString and TDateTime.
 Data types Real48 and Extended are not implemented.
 **Note:** JS doesn't support as big 64-bit integers as Delphi. To read those big values, use readInt64Precise() or readUInt64Precise(). Both methods return BigInt object.
 **Note:** When reading record you may need to read extra bytes because of field alignments. Use packed record to avoid this.

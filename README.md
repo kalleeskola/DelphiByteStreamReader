@@ -25,7 +25,7 @@ type
     b3: byte;
     Last: double;
   end;
-  
+
 procedure WriteTestBytes();
 var
   FS: TStream;
@@ -38,6 +38,7 @@ var
   charA: array[1..20] of Char;
   Rec: TExampleRec;
   PackedRec: TPackedRec;
+  dtDateTime: TDateTime;
 begin
   FS := TFileStream.Create('D2JSDemo.bin', fmCreate or fmShareExclusive) ;
   try
@@ -83,6 +84,11 @@ begin
     PackedRec.b3 := 56;
     PackedRec.Last := -987.65;
     FS.Write(PackedRec, SizeOf(PackedRec));
+
+    dtDateTime := EncodeDateTime(2019, 11, 15, 17, 20, 27, 789);
+    FS.Write(dtDateTime, SizeOf(dtDateTime));
+    dtDateTime := -1.25;      // 1899-12-29 06:00
+    FS.Write(dtDateTime, SizeOf(dtDateTime));
   finally
     FS.Free ;
   end;
@@ -123,8 +129,7 @@ end;
                         rec1.b1 = reader.readByte();         // 12
                         rec1.b2 = reader.readByte();         // 34
                         rec1.b3 = reader.readByte();         // 56
-                        reader.readByte();                   // Delphi alignment
-                        reader.readInteger();                // Delphi alignment
+                        reader.incOffset(5);                 // Delphi alignment
                         rec1.last = reader.readDouble();     // -987.65
                         
                         var s2 = reader.readShortString(10); // "Packed:"
@@ -133,6 +138,9 @@ end;
                         rec2.b2 = reader.readByte();         // 34
                         rec2.b3 = reader.readByte();         // 56
                         rec2.last = reader.readDouble();     // -987.65
+                        
+                        var d1 = reader.readDateTime();      // d1.toISOString() "2019-11-15T17:20:27.789Z"
+                        var d2 = reader.readDateTime();      // d2.toISOString() "1899-12-29T06:00:00.000Z"
                     };
                     reader.readAsArrayBuffer(filePath.files[0]);
                 }

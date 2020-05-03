@@ -280,7 +280,7 @@ var DelphiByteStreamReader = (function () {
 
     // ----------------
     // String types 
-    //-----------------    
+    //-----------------
     
     DelphiByteStreamReader.prototype.readShortString = function(savedLen = 255) {
         var actualLen = this.readByte();    // the first byte contains the actual length of the string
@@ -305,6 +305,28 @@ var DelphiByteStreamReader = (function () {
     DelphiByteStreamReader.prototype.readAnsiCharArray = function(savedLen, actualLen = -1) {
         var arr = this.readByteArray(savedLen);
         return bin2String(arr, actualLen);
+    }
+    
+    
+    // ----------------
+    // Date and Time types 
+    //-----------------
+
+    DelphiByteStreamReader.prototype.readDateTime = function() {
+        // In Delphi the TDateTime type maps to a Double 
+        // where the integral part is the number of days passed since 1899-12-30 00:00
+        // and the fractional part is fraction of a 24 hour day that has elapsed on that day.
+        // For example .25 always corresponds to 06:00 not depending on the sign of the the integral part.
+        // In JS, Date is internally stored as milliseconds since 1970-01-01 00:00
+        var val = this.readDouble();
+        var timeInMs = Date.UTC(1899, 11, 30, 0, 0, 0, 0);      // note: in JS months start from 0
+        if (val >= 0)
+            return new Date(timeInMs + 24*60*60*1000*val);     // note: debugger shows as local time
+        else {                                                  // use .toISOString() to show saved time
+            var integral = Math.trunc(val);              // negative
+            var fraction = Math.abs(val % 1);            // positive => val -2,75 becomes -2+0.75=-1.25 days backwards
+            return new Date(timeInMs + 24*60*60*1000*(integral + fraction));
+        }
     }
     
     

@@ -104,12 +104,11 @@ end;
         <script type="text/javascript" src="DelphiByteStreamReader.js"></script>
         <script type="text/javascript">
             function readByteStream(filePath) {
-                var output = "";
-                var reader = new FileReader();
+                var fileReader = new FileReader();
                 
                 if (filePath.files && filePath.files[0]) {
-                    reader.onload = function(e) {
-                        output = e.target.result;
+                    fileReader.onload = function(e) {
+                        var output = e.target.result;
 
                         var reader = new DelphiByteStreamReader(output);
                         
@@ -142,7 +141,7 @@ end;
                         var d1 = reader.readDateTime();      // d1.toISOString() "2019-11-15T17:20:27.789Z"
                         var d2 = reader.readDateTime();      // d2.toISOString() "1899-12-29T06:00:00.000Z"
                     };
-                    reader.readAsArrayBuffer(filePath.files[0]);
+                    fileReader.readAsArrayBuffer(filePath.files[0]);
                 }
             }
         </script>
